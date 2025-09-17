@@ -145,7 +145,10 @@ class _HeaderSection extends StatelessWidget {
             const SizedBox(width: 12),
             Row(
               children: [
-                const IconBadge(icon: Icons.calendar_today_outlined),
+                IconBadge(
+                  icon: Icons.calendar_today_outlined,
+                  onTap: () => Navigator.of(context).pushNamed('/calendar'),
+                ),
                 const SizedBox(width: 8),
                 const IconBadge(icon: Icons.sunny),
               ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'views/home/home_view.dart';
+import 'views/calendar/calendar_view.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -11,7 +12,10 @@ class App extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      routes: {'/': (context) => const HomeView()},
+      routes: {
+        '/': (context) => const HomeView(),
+        '/calendar': (context) => const CalendarView(),
+      },
     );
   }
 }
