@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../models/mood_record.dart';
 import '../models/quote.dart';
@@ -12,46 +11,41 @@ class FirebaseService {
   FirebaseService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final _uuid = const Uuid();
-
-  static const String _userIdKey = 'user_id';
-  String? _cachedUserId;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // ========== 사용자 관리 ==========
 
   /// 사용자 ID 가져오기 (없으면 새로 생성)
   Future<String> getUserId() async {
-    if (_cachedUserId != null) return _cachedUserId!;
+    // Ensure anonymous sign-in
+    if (_auth.currentUser == null) {
+      await _auth.signInAnonymously();
+    }
+    final userId = _auth.currentUser!.uid;
 
-    final prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString(_userIdKey);
-
-    if (userId == null) {
-      // 새 사용자 생성
-      userId = _uuid.v4();
-      await prefs.setString(_userIdKey, userId);
-
-      // Firestore에 사용자 문서 생성
-      await _firestore.collection('users').doc(userId).set({
+    // Create or update the user document
+    final userRef = _firestore.collection('users').doc(userId);
+    final userSnap = await userRef.get();
+    if (!userSnap.exists) {
+      await userRef.set({
         'createdAt': FieldValue.serverTimestamp(),
         'lastAccessedAt': FieldValue.serverTimestamp(),
+        'authProvider': 'anonymous',
       });
     } else {
-      // 기존 사용자 - 마지막 접속 시간 업데이트
-      await _firestore.collection('users').doc(userId).update({
+      await userRef.update({
         'lastAccessedAt': FieldValue.serverTimestamp(),
       });
     }
 
-    _cachedUserId = userId;
     return userId;
   }
 
   /// 사용자 ID 초기화 (테스트용)
   Future<void> resetUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_userIdKey);
-    _cachedUserId = null;
+    // Sign out and sign in again anonymously to simulate a new user session
+    await _auth.signOut();
+    await _auth.signInAnonymously();
   }
 
   // ========== 기분 기록 관리 ==========
