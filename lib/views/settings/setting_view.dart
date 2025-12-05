@@ -342,7 +342,9 @@ class _SettingViewState extends State<SettingView> {
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeThumbColor: AppColors.primary,
+        thumbColor: MaterialStateProperty.resolveWith<Color?>(
+          (states) => states.contains(MaterialState.selected) ? AppColors.primary : null,
+        ),
       ),
     );
   }
