@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moodavenue/theme/app_colors.dart';
 
 /// ---- 공통 아이콘 배지 -----------------------------------------------------
 class IconBadge extends StatelessWidget {
@@ -11,7 +12,7 @@ class IconBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(10);
     return Material(
-      color: Colors.white,
+      color: AppColors.surface,
       borderRadius: borderRadius,
       elevation: 0,
       child: InkWell(
@@ -21,17 +22,17 @@ class IconBadge extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: borderRadius,
             boxShadow: const [
               BoxShadow(
-                color: Color(0x1A1C1E21),
+                color: AppColors.shadowLight,
                 blurRadius: 10,
                 offset: Offset(0, 3),
               ),
             ],
           ),
-          child: Icon(icon, size: 18, color: const Color(0xFF6B6F76)),
+          child: Icon(icon, size: 18, color: AppColors.primary),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moodavenue/theme/app_colors.dart';
 
 /// ---- REUSABLE: 공통 카드 컨테이너 -----------------------------------------
 class CardContainer extends StatelessWidget {
@@ -12,11 +13,11 @@ class CardContainer extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x1A1C1E21),
+            color: AppColors.shadow,
             blurRadius: 12,
             offset: Offset(0, 4),
           ),
