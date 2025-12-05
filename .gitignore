@@ -1,3 +1,65 @@
+# General
+.DS_Store
+*.log
+
+# Editors/IDE
+.idea/
+.vscode/
+*.iml
+.fleet/
+
+# Env files
+.env
+.env.*
+*.env
+*.env.*
+
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Android
+android/.gradle/
+android/local.properties
+android/**/captures/
+android/**/outputs/
+android/**/intermediates/
+android/**/generated/
+android/**/gradleBuild/
+android/**/.cxx/
+android/**/.externalNativeBuild/
+android/**/build/
+
+# Android Keystore (signing)
+**/*.keystore
+**/*.jks
+**/key.properties
+
+# Firebase (Android)
+android/app/google-services.json
+
+# iOS
+ios/DerivedData/
+ios/**/xcuserdata/
+ios/**/*.xcuserstate
+ios/.symlinks/
+ios/Pods/
+ios/Flutter/ephemeral/
+ios/Flutter/Generated.xcconfig
+
+# Firebase (iOS)
+ios/**/GoogleService-Info.plist
+
+# Misc platform outputs
+**/.gradle/
+**/build/
+
 # Created by https://www.toptal.com/developers/gitignore/api/macos,xcode,android,androidstudio,web,linux,dart,flutter
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,xcode,android,androidstudio,web,linux,dart,flutter
 
