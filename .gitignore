@@ -56,6 +56,13 @@ ios/Flutter/Generated.xcconfig
 # Firebase (iOS)
 ios/**/GoogleService-Info.plist
 
+# Firebase (Flutter options & exports)
+lib/firebase_options.dart
+**/firebase_options.dart
+FIRESTORE_SUMMARY.md
+firestore_export/
+firebase-debug.log
+
 # Misc platform outputs
 **/.gradle/
 **/build/
