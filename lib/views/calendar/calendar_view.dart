@@ -76,11 +76,6 @@ class _CalendarViewState extends State<CalendarView> {
                     const RecordCard(),
                     const SizedBox(height: 12),
                     const MonthlyMoodCard(),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.15,
-                      child: const AdPlaceholder(),
-                    ),
                   ],
                 ),
               );
