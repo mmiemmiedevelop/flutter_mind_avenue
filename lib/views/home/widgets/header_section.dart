@@ -18,7 +18,7 @@ class HeaderSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 30),
+        const SizedBox(height: 10),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -26,8 +26,7 @@ class HeaderSection extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('안녕하세요!', style: AppTextStyles.heading1),
-                  const Text('heylin님✋🏻', style: AppTextStyles.heading1),
+                  const Text('지금, 당신을 위한 한 문장.', style: AppTextStyles.heading1),
                   const SizedBox(height: 8),
                   Text(formattedDate, style: AppTextStyles.heading3),
                 ],
@@ -53,4 +52,3 @@ class HeaderSection extends StatelessWidget {
     );
   }
 }
-

@@ -40,7 +40,7 @@ class AppTextStyles {
   /// 대제목 (화면 제목 등)
   static const TextStyle heading1 = TextStyle(
     fontFamily: 'Inter',
-    fontSize: 32,
+    fontSize: 22,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
     height: 1.25,
@@ -50,7 +50,7 @@ class AppTextStyles {
   /// 중제목 (섹션 제목 등)
   static const TextStyle heading2 = TextStyle(
     fontFamily: 'Inter',
-    fontSize: 24,
+    fontSize: 14,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     height: 1.3,
@@ -60,7 +60,7 @@ class AppTextStyles {
   /// 소제목 (카드 제목 등)
   static const TextStyle heading3 = TextStyle(
     fontFamily: 'Inter',
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     height: 1.4,
@@ -341,4 +341,3 @@ class AppTextStyles {
     height: 1.2,
   );
 }
-

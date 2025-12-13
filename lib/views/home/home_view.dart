@@ -21,58 +21,64 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ---- HEADER (비율 2) -------------------------------------------
-              Expanded(flex: 2, child: HeaderSection()),
-              const SizedBox(height: 12),
+    return GestureDetector(
+      onTap: () {
+        // 화면 터치 시 키보드 포커스 해제
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        resizeToAvoidBottomInset: true, // 키보드가 올라올 때 화면 크기 조정
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ---- HEADER -------------------------------------------
+                const HeaderSection(),
+                const SizedBox(height: 20),
 
-              // ---- QUOTE (비율 3) --------------------------------------------
-              Expanded(flex: 3, child: QuoteCard()),
-              const SizedBox(height: 12),
+                // ---- QUOTE --------------------------------------------
+                const SizedBox(height: 180, child: QuoteCard()),
+                const SizedBox(height: 15),
 
-              // ---- MOOD (비율 2) ---------------------------------------------
-              Expanded(
-                flex: 2,
-                child: CardContainer(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('오늘의 기분', style: AppTextStyles.heading3),
-                      const SizedBox(height: 12),
-                      const MoodSelectorBar(),
-                    ],
+                // ---- MOOD ---------------------------------------------
+                SizedBox(
+                  height: 120,
+                  child: CardContainer(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('오늘의 기분', style: AppTextStyles.heading3),
+                        const SizedBox(height: 8),
+                        Expanded(child: Center(child: MoodSelectorBar())),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
+                const SizedBox(height: 15),
 
-              // ---- NOTE (비율 2) ---------------------------------------------
-              Expanded(
-                flex: 2,
-                child: CardContainer(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('기록 한마디', style: AppTextStyles.heading3),
-                      const SizedBox(height: 12),
-                      const Expanded(child: NoteInput()),
-                    ],
+                // ---- NOTE ---------------------------------------------
+                SizedBox(
+                  height: 160,
+                  child: CardContainer(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('기록 한마디', style: AppTextStyles.heading3),
+                        const SizedBox(height: 8),
+                        const Expanded(child: NoteInput()),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
+                const SizedBox(height: 15),
 
-              // ---- AD (비율 2) -----------------------------------------------
-              Expanded(flex: 2, child: const AdPlaceholder()),
-            ],
+                // ---- AD -----------------------------------------------
+                const SizedBox(height: 100, child: AdPlaceholder()),
+              ],
+            ),
           ),
         ),
       ),
