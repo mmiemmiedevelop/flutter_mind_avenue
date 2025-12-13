@@ -53,21 +53,17 @@ class _SettingViewState extends State<SettingView> {
     ).showSnackBar(const SnackBar(content: Text('다크모드는 향후 버전에서 지원될 예정입니다')));
   }
 
-  /// 이메일 보내기
-  Future<void> _sendEmail() async {
-    final Uri emailUri = Uri(
-      scheme: 'mailto',
-      path: 'developer@moodavenue.com',
-      query: 'subject=무드애비뉴 문의&body=',
-    );
+  /// 카카오톡 오픈채팅방 열기
+  Future<void> _openKakaoChat() async {
+    final Uri kakaoUri = Uri.parse('https://open.kakao.com/o/shGgep6h');
 
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
-    } else {
+    try {
+      await launchUrl(kakaoUri, mode: LaunchMode.externalApplication);
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('이메일 앱을 실행할 수 없습니다')));
+        ).showSnackBar(const SnackBar(content: Text('카카오톡 오픈채팅방을 열 수 없습니다')));
       }
     }
   }
@@ -161,7 +157,7 @@ class _SettingViewState extends State<SettingView> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('세팅'),
+        title: const Text('설정'),
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
@@ -170,12 +166,6 @@ class _SettingViewState extends State<SettingView> {
         children: [
           // 일반 섹션
           _buildSectionHeader('일반'),
-          _buildSwitchTile(
-            icon: Icons.notifications_outlined,
-            title: '알림 설정',
-            value: _notificationEnabled,
-            onChanged: _saveNotificationSetting,
-          ),
           _buildSwitchTile(
             icon: Icons.dark_mode_outlined,
             title: '다크 모드',
@@ -188,12 +178,6 @@ class _SettingViewState extends State<SettingView> {
           // 데이터 섹션
           _buildSectionHeader('데이터'),
           _buildTile(
-            icon: Icons.backup_outlined,
-            title: '데이터 백업',
-            subtitle: '클라우드에 백업',
-            onTap: _showBackupDialog,
-          ),
-          _buildTile(
             icon: Icons.cleaning_services_outlined,
             title: '캐시 삭제',
             subtitle: '임시 파일 정리',
@@ -204,10 +188,9 @@ class _SettingViewState extends State<SettingView> {
           // 지원 섹션
           _buildSectionHeader('지원'),
           _buildTile(
-            icon: Icons.email_outlined,
-            title: '개발자에게 메시지 보내기',
-            subtitle: 'developer@moodavenue.com',
-            onTap: _sendEmail,
+            icon: Icons.chat_bubble_outline,
+            title: '문의사항',
+            onTap: _openKakaoChat,
           ),
           _buildTile(
             icon: Icons.article_outlined,
@@ -215,7 +198,7 @@ class _SettingViewState extends State<SettingView> {
             onTap: () {
               showLicensePage(
                 context: context,
-                applicationName: '무드애비뉴',
+                applicationName: 'Mood',
                 applicationVersion: '1.0.0',
                 applicationIcon: const Icon(Icons.mood, size: 48),
               );
@@ -251,17 +234,6 @@ class _SettingViewState extends State<SettingView> {
             onTap: _showResetDialog,
           ),
           const SizedBox(height: 32),
-
-          // 푸터
-          Center(
-            child: Text(
-              'Made with ❤️ by MoodAvenue Team',
-              style: AppTextStyles.body14Regular.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
         ],
       ),
     );
@@ -343,7 +315,9 @@ class _SettingViewState extends State<SettingView> {
         value: value,
         onChanged: onChanged,
         thumbColor: MaterialStateProperty.resolveWith<Color?>(
-          (states) => states.contains(MaterialState.selected) ? AppColors.primary : null,
+          (states) => states.contains(MaterialState.selected)
+              ? AppColors.primary
+              : null,
         ),
       ),
     );
