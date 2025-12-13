@@ -21,6 +21,20 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 화면 높이를 가져와서 비율 계산
+    final screenHeight = MediaQuery.of(context).size.height;
+    final viewPadding = MediaQuery.of(context).viewPadding;
+    final availableHeight =
+        screenHeight -
+        viewPadding.top -
+        viewPadding.bottom -
+        32; // 32 = vertical padding
+
+    // 전체 비율: HEADER(3) + QUOTE(5) + MOOD(5) + NOTE(5) + AD(4) = 22
+    // 간격: 15px * 4개 = 60px
+    final contentHeight =
+        availableHeight - 60 - 20; // 60 = 간격, 20 = header 아래 여백
+
     return GestureDetector(
       onTap: () {
         // 화면 터치 시 키보드 포커스 해제
@@ -35,17 +49,23 @@ class HomeView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // ---- HEADER -------------------------------------------
-                const HeaderSection(),
+                // ---- HEADER (비율 3/22) -------------------------------------------
+                SizedBox(
+                  height: contentHeight * 3 / 22,
+                  child: const HeaderSection(),
+                ),
                 const SizedBox(height: 20),
 
-                // ---- QUOTE --------------------------------------------
-                const SizedBox(height: 180, child: QuoteCard()),
+                // ---- QUOTE (비율 5/22) --------------------------------------------
+                SizedBox(
+                  height: contentHeight * 5 / 22,
+                  child: const QuoteCard(),
+                ),
                 const SizedBox(height: 15),
 
-                // ---- MOOD ---------------------------------------------
+                // ---- MOOD (비율 5/22) ---------------------------------------------
                 SizedBox(
-                  height: 120,
+                  height: contentHeight * 5 / 22,
                   child: CardContainer(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,9 +79,9 @@ class HomeView extends StatelessWidget {
                 ),
                 const SizedBox(height: 15),
 
-                // ---- NOTE ---------------------------------------------
+                // ---- NOTE (비율 5/22) ---------------------------------------------
                 SizedBox(
-                  height: 160,
+                  height: contentHeight * 5 / 22,
                   child: CardContainer(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,8 +95,11 @@ class HomeView extends StatelessWidget {
                 ),
                 const SizedBox(height: 15),
 
-                // ---- AD -----------------------------------------------
-                const SizedBox(height: 100, child: AdPlaceholder()),
+                // ---- AD (비율 4/22) -----------------------------------------------
+                SizedBox(
+                  height: contentHeight * 4 / 22,
+                  child: const AdPlaceholder(),
+                ),
               ],
             ),
           ),

@@ -82,7 +82,7 @@ class _NoteInputState extends State<NoteInput> {
           color: AppColors.textPrimary,
         ),
         decoration: InputDecoration.collapsed(
-          hintText: '내 오늘의 기분은 말이지...',
+          hintText: '솔직한 내 오늘의 기분을 적어보세요',
           hintStyle: AppTextStyles.body16Regular.copyWith(
             color: AppColors.textTertiary,
           ),
