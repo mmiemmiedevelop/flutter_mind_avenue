@@ -3,6 +3,7 @@ import 'package:moodavenue/services/firebase.dart';
 import 'package:moodavenue/models/quote.dart';
 import 'package:moodavenue/theme/app_colors.dart';
 import 'package:moodavenue/theme/app_text_styles.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// 감성적인 인용구를 표시하는 카드 위젯
 class QuoteCard extends StatefulWidget {
@@ -18,13 +19,41 @@ class _QuoteCardState extends State<QuoteCard> {
   @override
   void initState() {
     super.initState();
-    _quoteFuture = FirebaseService().getRandomQuoteByAverageMood(days: 7);
+    _quoteFuture = _loadQuote();
   }
 
-  void _reloadQuote() {
-    setState(() {
-      _quoteFuture = FirebaseService().getRandomQuoteByAverageMood(days: 7);
-    });
+  Future<Quote?> _loadQuote() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0]; // YYYY-MM-DD
+    final savedDate = prefs.getString('quote_date');
+    final savedQuoteText = prefs.getString('quote_text');
+    final savedQuoteAuthor = prefs.getString('quote_author');
+    final savedQuoteMoodLevel = prefs.getInt('quote_mood_level');
+
+    // 저장된 날짜가 오늘과 같고 저장된 인용구가 있으면 캐시 사용
+    if (savedDate == today &&
+        savedQuoteText != null &&
+        savedQuoteMoodLevel != null) {
+      return Quote(
+        id: 'cached',
+        moodLevel: savedQuoteMoodLevel,
+        text: savedQuoteText,
+        author: savedQuoteAuthor ?? '',
+      );
+    }
+
+    // 새로운 인용구 가져오기
+    final quote = await FirebaseService().getRandomQuoteByAverageMood(days: 7);
+
+    if (quote != null) {
+      // 새로운 인용구 저장
+      await prefs.setString('quote_date', today);
+      await prefs.setString('quote_text', quote.text);
+      await prefs.setString('quote_author', quote.author ?? '');
+      await prefs.setInt('quote_mood_level', quote.moodLevel);
+    }
+
+    return quote;
   }
 
   @override
@@ -49,21 +78,19 @@ class _QuoteCardState extends State<QuoteCard> {
           }
 
           if (snapshot.hasError) {
-            return _QuoteContent(
+            return const _QuoteContent(
               title: '오늘 한 줄',
               quote: '잠시 후 다시 시도해 주세요.',
               author: null,
-              onRefresh: _reloadQuote,
             );
           }
 
           final quote = snapshot.data;
           if (quote == null) {
-            return _QuoteContent(
+            return const _QuoteContent(
               title: '오늘 한 줄',
               quote: '준비된 문장이 없어요.\n기분을 조금 더 기록해볼까요?',
               author: null,
-              onRefresh: _reloadQuote,
             );
           }
 
@@ -71,7 +98,6 @@ class _QuoteCardState extends State<QuoteCard> {
             title: '오늘 한 줄',
             quote: quote.text,
             author: quote.author,
-            onRefresh: _reloadQuote,
           );
         },
       ),
@@ -83,14 +109,8 @@ class _QuoteContent extends StatelessWidget {
   final String title;
   final String quote;
   final String? author;
-  final VoidCallback onRefresh;
 
-  const _QuoteContent({
-    required this.title,
-    required this.quote,
-    required this.onRefresh,
-    this.author,
-  });
+  const _QuoteContent({required this.title, required this.quote, this.author});
 
   @override
   Widget build(BuildContext context) {
@@ -101,31 +121,11 @@ class _QuoteContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: AppTextStyles.heading3.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 32,
-                  height: 32,
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.refresh,
-                      color: AppColors.textSecondary,
-                      size: 20,
-                    ),
-                    onPressed: onRefresh,
-                    tooltip: '새로고침',
-                    padding: EdgeInsets.zero,
-                  ),
-                ),
-              ],
+            Text(
+              title,
+              style: AppTextStyles.heading3.copyWith(
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 14),
             Text(
