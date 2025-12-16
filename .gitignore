@@ -14,6 +14,10 @@
 *.env
 *.env.*
 
+# Security - DO NOT COMMIT
+# AdMob과 Firebase 민감 정보는 절대 커밋하지 마세요!
+# 자세한 내용은 SECURITY.md 참조
+
 # Flutter / Dart
 .dart_tool/
 .packages
