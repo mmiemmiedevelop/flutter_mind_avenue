@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:moodavenue/theme/app_colors.dart';
 import 'package:confetti/confetti.dart';
+import 'package:moodavenue/services/firebase.dart';
 
 /// ---- MOOD 선택 바 ----------------------------------------------------------
 class MoodSelectorBar extends StatefulWidget {
-  const MoodSelectorBar({super.key});
+  final int? initialMoodLevel;
+  final bool isReadOnly;
+
+  const MoodSelectorBar({
+    super.key,
+    this.initialMoodLevel,
+    this.isReadOnly = false,
+  });
 
   @override
   State<MoodSelectorBar> createState() => _MoodSelectorBarState();
@@ -46,9 +54,18 @@ class _MoodSelectorBarState extends State<MoodSelectorBar>
   late AnimationController _shakeController;
   late Animation<double> _scaleAnimation;
 
+  final FirebaseService _firebaseService = FirebaseService();
+  bool _isSaving = false; // 저장 중 상태
+
   @override
   void initState() {
     super.initState();
+
+    // 초기값 설정 (moodLevel 1-5를 index 0-4로 변환)
+    if (widget.initialMoodLevel != null) {
+      _selectedIndex = widget.initialMoodLevel! - 1;
+    }
+
     // 첫 2개 감정(😁, 😇)에만 컨페티 컨트롤러 생성
     _confettiControllers = List.generate(
       2,
@@ -89,6 +106,45 @@ class _MoodSelectorBarState extends State<MoodSelectorBar>
     super.dispose();
   }
 
+  /// Firebase에 기분 저장
+  Future<void> _saveMood(int index) async {
+    if (_isSaving) return; // 이미 저장 중이면 무시
+
+    setState(() => _isSaving = true);
+
+    try {
+      // index는 0-4, moodLevel은 1-5 (1=매우좋음, 5=매우나쁨)
+      final moodLevel = index + 1;
+      await _firebaseService.saveTodayMood(moodLevel: moodLevel);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('오늘의 기분이 저장되었어요 ${_emojis[index]}'),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: _moodColors[index],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('저장에 실패했어요. 다시 시도해주세요.'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -109,17 +165,35 @@ class _MoodSelectorBarState extends State<MoodSelectorBar>
             children: List.generate(_emojis.length, (index) {
               final bool isSelected = index == _selectedIndex;
               return GestureDetector(
-                onTap: () {
-                  setState(() => _selectedIndex = index);
-                  // 첫 2개 감정(😁, 😇)만 컨페티 효과
-                  if (index < 2) {
-                    _confettiControllers[index].play();
-                  }
-                  // 부정적 감정(😢, 😡)은 scale 애니메이션
-                  else if (index >= 3) {
-                    _shakeController.forward(from: 0);
-                  }
-                },
+                onTap: (_isSaving || widget.isReadOnly)
+                    ? () {
+                        // 읽기 전용일 때 알림 표시
+                        if (widget.isReadOnly) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('오늘의 기분은 이미 기록되었어요 😊'),
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: AppColors.primary,
+                            ),
+                          );
+                        }
+                      }
+                    : () {
+                        setState(() => _selectedIndex = index);
+
+                        // 첫 2개 감정(😁, 😇)만 컨페티 효과
+                        if (index < 2) {
+                          _confettiControllers[index].play();
+                        }
+                        // 부정적 감정(😢, 😡)은 scale 애니메이션
+                        else if (index >= 3) {
+                          _shakeController.forward(from: 0);
+                        }
+
+                        // Firebase에 저장
+                        _saveMood(index);
+                      },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.fastOutSlowIn,

@@ -4,7 +4,9 @@ import 'package:moodavenue/widgets/card_container.dart';
 
 /// 내가 남긴 기록 카드
 class RecordCard extends StatelessWidget {
-  const RecordCard({super.key});
+  final String? note;
+
+  const RecordCard({super.key, this.note});
 
   @override
   Widget build(BuildContext context) {
@@ -14,13 +16,9 @@ class RecordCard extends StatelessWidget {
         children: [
           const Text('내가 남긴 기록', style: AppTextStyles.heading3),
           const SizedBox(height: 12),
-          Text(
-            '선택한 날짜의 기록이 여기에 표시됩니다.',
-            style: AppTextStyles.bodySmall,
-          ),
+          Text(note ?? '남긴 기록이 없습니다.', style: AppTextStyles.bodySmall),
         ],
       ),
     );
   }
 }
-

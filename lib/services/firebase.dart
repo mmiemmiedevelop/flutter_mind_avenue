@@ -33,9 +33,7 @@ class FirebaseService {
         'authProvider': 'anonymous',
       });
     } else {
-      await userRef.update({
-        'lastAccessedAt': FieldValue.serverTimestamp(),
-      });
+      await userRef.update({'lastAccessedAt': FieldValue.serverTimestamp()});
     }
 
     return userId;
@@ -75,6 +73,27 @@ class FirebaseService {
         .collection('mood_records')
         .doc(dateId)
         .set(moodRecord.toFirestore());
+  }
+
+  /// 오늘 기분 기록의 노트만 업데이트하기
+  /// 기존 기록이 없으면 예외 발생
+  Future<void> updateTodayNote(String note) async {
+    final userId = await getUserId();
+    final today = DateTime.now();
+    final dateId = DateFormat('yyyy-MM-dd').format(today);
+
+    final docRef = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('mood_records')
+        .doc(dateId);
+
+    final doc = await docRef.get();
+    if (!doc.exists) {
+      throw Exception('오늘의 기분 기록이 없습니다. 먼저 기분을 선택해주세요.');
+    }
+
+    await docRef.update({'note': note});
   }
 
   // /// 특정 날짜 기분 기록하기

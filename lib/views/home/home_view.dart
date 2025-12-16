@@ -7,6 +7,7 @@ import 'package:moodavenue/views/home/widgets/quote_card.dart';
 import 'package:moodavenue/widgets/ad_placeholder.dart';
 import 'package:moodavenue/theme/app_colors.dart';
 import 'package:moodavenue/theme/app_text_styles.dart';
+import 'package:moodavenue/services/firebase.dart';
 
 /// 홈 화면
 ///
@@ -16,8 +17,56 @@ import 'package:moodavenue/theme/app_text_styles.dart';
 /// ---- MOOD: "오늘의 기분" 이모지 선택 바
 /// ---- NOTE: "기록 한마디" 텍스트 입력 카드
 /// ---- AD: 광고 영역(플레이스홀더)
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  final FirebaseService _firebaseService = FirebaseService();
+  int? _initialMoodLevel;
+  String? _initialNote;
+  bool _hasRecord = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTodayRecord();
+  }
+
+  /// 오늘의 기록 불러오기
+  Future<void> _loadTodayRecord() async {
+    try {
+      final today = DateTime.now();
+      final record = await _firebaseService.getMoodByDate(today);
+
+      if (mounted) {
+        setState(() {
+          if (record != null) {
+            _initialMoodLevel = record.moodLevel;
+            _initialNote = record.note;
+            _hasRecord = true;
+          }
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('데이터를 불러오는데 실패했어요: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +83,15 @@ class HomeView extends StatelessWidget {
     // 간격: 15px * 4개 = 60px
     final contentHeight =
         availableHeight - 60 - 20; // 60 = 간격, 20 = header 아래 여백
+
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      );
+    }
 
     return GestureDetector(
       onTap: () {
@@ -70,9 +128,40 @@ class HomeView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('오늘의 기분', style: AppTextStyles.heading3),
+                        Row(
+                          children: [
+                            const Text('오늘의 기분', style: AppTextStyles.heading3),
+                            if (_hasRecord) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  '기록완료',
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                         const SizedBox(height: 8),
-                        Expanded(child: Center(child: MoodSelectorBar())),
+                        Expanded(
+                          child: Center(
+                            child: MoodSelectorBar(
+                              initialMoodLevel: _initialMoodLevel,
+                              isReadOnly: _hasRecord,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -86,9 +175,38 @@ class HomeView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('기록 한마디', style: AppTextStyles.heading3),
+                        Row(
+                          children: [
+                            const Text('기록 한마디', style: AppTextStyles.heading3),
+                            if (_hasRecord) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  '기록완료',
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                         const SizedBox(height: 8),
-                        const Expanded(child: NoteInput()),
+                        Expanded(
+                          child: NoteInput(
+                            initialNote: _initialNote,
+                            isReadOnly: _hasRecord,
+                          ),
+                        ),
                       ],
                     ),
                   ),
